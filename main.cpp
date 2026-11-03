@@ -52,7 +52,7 @@ int main(void)
     theBall.radius = 20.00f;
     theBall.color = WHITE;
 
-    int theBallSpeed{-2000};
+    float theBallSpeed{-2000.0f};
 
     // Score Boundries
     Rectangle leftScoreBoundry;
@@ -95,7 +95,7 @@ int main(void)
         // DrawRectangleRec(rightScoreBoundry, RED);
 
         // Ball
-        DrawCircle(theBall.x, theBall.y, theBall.radius, theBall.color);
+        DrawCircleV({theBall.x, theBall.y}, theBall.radius, theBall.color);
 
         // Ball Movement
         theBall.x += theBallSpeed * GetFrameTime();
