@@ -2,6 +2,27 @@
 #include <raylib.h>
 #include <string>
 
+// the ball
+struct Ball {
+    float x;
+    float y;
+    float radius;
+    Color color;
+};
+
+bool isBallTouchingAnyPlayer(Ball ball, Rectangle player1, Rectangle player2)
+{
+    if (CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, player1)) {
+        return true;
+    }
+
+    if (CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, player2)) {
+        return true;
+    }
+
+    return false;
+}
+
 int main(void)
 {
     // Current Display
@@ -25,28 +46,20 @@ int main(void)
 
     // PLAYERS
     // left player
-    Rectangle leftSidePlayerRec;
-    leftSidePlayerRec.height = 200;
-    leftSidePlayerRec.width = 30;
-    leftSidePlayerRec.x = 100;
-    leftSidePlayerRec.y = gameWindowHeight / 2;
+    Rectangle leftPlayer;
+    leftPlayer.height = 200;
+    leftPlayer.width = 30;
+    leftPlayer.x = 100;
+    leftPlayer.y = gameWindowHeight / 2;
 
     // right player
-    Rectangle rightSidePlayerRec;
-    rightSidePlayerRec.height = 200;
-    rightSidePlayerRec.width = 30;
-    rightSidePlayerRec.x = gameWindowWidth - 130;
-    rightSidePlayerRec.y = gameWindowHeight / 2;
+    Rectangle rightPlayer;
+    rightPlayer.height = 200;
+    rightPlayer.width = 30;
+    rightPlayer.x = gameWindowWidth - 130;
+    rightPlayer.y = gameWindowHeight / 2;
 
-    // the ball
-    struct Circle {
-        float x;
-        float y;
-        float radius;
-        Color color;
-    };
-
-    Circle theBall;
+    Ball theBall;
     theBall.x = gameWindowWidth / 2;
     theBall.y = gameWindowHeight / 2 + 80;
     theBall.radius = 20.00f;
@@ -85,10 +98,10 @@ int main(void)
 
         // Left player
         // DrawRectangle(100, gameWindowHeight / 2, 30, 200, WHITE);
-        DrawRectangleRec(leftSidePlayerRec, WHITE);
+        DrawRectangleRec(leftPlayer, WHITE);
 
         // Right player
-        DrawRectangleRec(rightSidePlayerRec, WHITE);
+        DrawRectangleRec(rightPlayer, WHITE);
 
         // No need to draw them, leaving them for DEBUG
         // DrawRectangleRec(leftScoreBoundry, RED);
@@ -100,27 +113,19 @@ int main(void)
         // Ball Movement
         theBall.x += theBallSpeed * GetFrameTime();
 
-        // left side player
-        if (CheckCollisionCircleRec({theBall.x, theBall.y}, theBall.radius,
-                                    leftSidePlayerRec)) {
-            theBallSpeed = -theBallSpeed;
-        }
-
-        // right side player
-        if (CheckCollisionCircleRec({theBall.x, theBall.y}, theBall.radius,
-                                    rightSidePlayerRec)) {
+        if (isBallTouchingAnyPlayer(theBall, leftPlayer, rightPlayer)) {
             theBallSpeed = -theBallSpeed;
         }
 
         // Player movement
         if (IsKeyDown(KEY_W)) {
-            rightSidePlayerRec.y -= 1500 * GetFrameTime();
-            leftSidePlayerRec.y -= 1500 * GetFrameTime();
+            rightPlayer.y -= 1500 * GetFrameTime();
+            leftPlayer.y -= 1500 * GetFrameTime();
         }
 
         if (IsKeyDown(KEY_S)) {
-            rightSidePlayerRec.y += 1500 * GetFrameTime();
-            leftSidePlayerRec.y += 1500 * GetFrameTime();
+            rightPlayer.y += 1500 * GetFrameTime();
+            leftPlayer.y += 1500 * GetFrameTime();
         }
 
         if (CheckCollisionCircleRec({theBall.x, theBall.y}, theBall.radius,
