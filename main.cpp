@@ -72,18 +72,23 @@ int main(void)
     std::string rightScoreBoardNum = std::to_string(rightPlayerScore);
 
     // PLAYERS
+    constexpr int playersHeight{500};
+    constexpr int playersWidth{30};
+
     // left player
-    Rectangle leftPlayer;
-    leftPlayer.height = 200;
-    leftPlayer.width = 30;
-    leftPlayer.x = 100;
+    constexpr int playerLeftOffset{100};
+    Rectangle leftPlayer{};
+    leftPlayer.height = playersHeight;
+    leftPlayer.width = playersWidth;
+    leftPlayer.x = playerLeftOffset;
     leftPlayer.y = gameWindowHeight / 2;
 
     // right player
+    constexpr int playerRightOffset{gameWindowWidth - 130};
     Rectangle rightPlayer;
-    rightPlayer.height = 200;
-    rightPlayer.width = 30;
-    rightPlayer.x = gameWindowWidth - 130;
+    rightPlayer.height = playersHeight;
+    rightPlayer.width = playersWidth;
+    rightPlayer.x = playerRightOffset;
     rightPlayer.y = gameWindowHeight / 2;
 
     Ball theBall;
@@ -139,14 +144,15 @@ int main(void)
         }
 
         // Player movement
+        float playerMovementSpeed{1500 * GetFrameTime()};
         if (IsKeyDown(KEY_W)) {
-            rightPlayer.y -= 1500 * GetFrameTime();
-            leftPlayer.y -= 1500 * GetFrameTime();
+            rightPlayer.y -= playerMovementSpeed;
+            leftPlayer.y -= playerMovementSpeed;
         }
 
         if (IsKeyDown(KEY_S)) {
-            rightPlayer.y += 1500 * GetFrameTime();
-            leftPlayer.y += 1500 * GetFrameTime();
+            rightPlayer.y += playerMovementSpeed;
+            leftPlayer.y += playerMovementSpeed;
         }
 
         // Scoring Mechanics
