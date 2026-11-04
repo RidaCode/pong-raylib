@@ -122,19 +122,14 @@ int main(void)
         std::string leftScoreBoardNum = std::to_string(leftPlayerScore);
         std::string rightScoreBoardNum = std::to_string(rightPlayerScore);
 
-        // Left player
-        // DrawRectangle(100, gameWindowHeight / 2, 30, 200, WHITE);
-        DrawRectangleRec(leftPlayer, WHITE);
-
-        // Right player
-        DrawRectangleRec(rightPlayer, WHITE);
+        // Drawing
+        drawScoreBoard(gameWindowWidth, leftScoreBoardNum, rightScoreBoardNum);
+        drawPlayers(leftPlayer, BLUE, rightPlayer, RED);
+        drawBall(theBall);
 
         // No need to draw them, leaving them for DEBUG
         // DrawRectangleRec(leftScoreBoundry, RED);
         // DrawRectangleRec(rightScoreBoundry, RED);
-
-        // Ball
-        DrawCircleV({theBall.x, theBall.y}, theBall.radius, theBall.color);
 
         // Ball Movement
         theBall.x += theBallSpeed * GetFrameTime();
