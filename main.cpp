@@ -23,6 +23,33 @@ bool isBallTouchingAnyPlayer(Ball ball, Rectangle player1, Rectangle player2)
     return false;
 }
 
+bool hasPlayerScored(Ball ball, Rectangle scoreArea)
+{
+    return CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, scoreArea);
+}
+
+void drawScoreBoard(const int gameWindowWidth, std::string leftScoreBoardNum,
+                    std::string rightScoreBoardNum)
+{
+    DrawText(" - ", gameWindowWidth / 2, 50, 94, WHITE);
+    DrawText(leftScoreBoardNum.c_str(), gameWindowWidth / 2 - 200, 50, 94,
+             WHITE);
+    DrawText(rightScoreBoardNum.c_str(), gameWindowWidth / 2 + 200, 50, 94,
+             WHITE);
+}
+
+void drawPlayers(Rectangle leftPlayer, Color leftPlayerColor,
+                 Rectangle rightPlayer, Color rightPlayerColor)
+{
+    DrawRectangleRec(leftPlayer, leftPlayerColor);
+    DrawRectangleRec(rightPlayer, rightPlayerColor);
+}
+
+void drawBall(Ball ball)
+{
+    DrawCircleV({ball.x, ball.y}, ball.radius, ball.color);
+}
+
 int main(void)
 {
     // Current Display
@@ -38,11 +65,11 @@ int main(void)
     SetTargetFPS(60);
 
     // Scoreboard
-    int leftSidePlayerScore{};
-    std::string leftScoreBoardNum = std::to_string(leftSidePlayerScore);
+    int leftPlayerScore{};
+    std::string leftScoreBoardNum = std::to_string(leftPlayerScore);
 
-    int rightSidePlayerScore{};
-    std::string rightScoreBoardNum = std::to_string(rightSidePlayerScore);
+    int rightPlayerScore{};
+    std::string rightScoreBoardNum = std::to_string(rightPlayerScore);
 
     // PLAYERS
     // left player
@@ -87,14 +114,8 @@ int main(void)
         ClearBackground(BLACK);
 
         // Score board top
-        std::string leftScoreBoardNum = std::to_string(leftSidePlayerScore);
-        std::string rightScoreBoardNum = std::to_string(rightSidePlayerScore);
-
-        DrawText(" - ", gameWindowWidth / 2, 50, 94, WHITE);
-        DrawText(leftScoreBoardNum.c_str(), gameWindowWidth / 2 - 200, 50, 94,
-                 WHITE);
-        DrawText(rightScoreBoardNum.c_str(), gameWindowWidth / 2 + 200, 50, 94,
-                 WHITE);
+        std::string leftScoreBoardNum = std::to_string(leftPlayerScore);
+        std::string rightScoreBoardNum = std::to_string(rightPlayerScore);
 
         // Left player
         // DrawRectangle(100, gameWindowHeight / 2, 30, 200, WHITE);
@@ -128,17 +149,16 @@ int main(void)
             leftPlayer.y += 1500 * GetFrameTime();
         }
 
-        if (CheckCollisionCircleRec({theBall.x, theBall.y}, theBall.radius,
-                                    rightScoreBoundry)) {
-            leftSidePlayerScore += 1;
+        // Scoring Mechanics
+        if (hasPlayerScored(theBall, rightScoreBoundry)) {
+            leftPlayerScore += 1;
             // restart the game
             theBall.x = gameWindowWidth / 2;
             theBall.y = gameWindowHeight / 2 + 80;
         }
 
-        if (CheckCollisionCircleRec({theBall.x, theBall.y}, theBall.radius,
-                                    leftScoreBoundry)) {
-            rightSidePlayerScore += 1;
+        if (hasPlayerScored(theBall, leftScoreBoundry)) {
+            rightPlayerScore += 1;
             // restart the game
             theBall.x = gameWindowWidth / 2;
             theBall.y = gameWindowHeight / 2 + 80;
