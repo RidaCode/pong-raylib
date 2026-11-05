@@ -119,8 +119,8 @@ int main(void)
         ClearBackground(BLACK);
 
         // Score board top
-        std::string leftScoreBoardNum = std::to_string(leftPlayerScore);
-        std::string rightScoreBoardNum = std::to_string(rightPlayerScore);
+        leftScoreBoardNum = std::to_string(leftPlayerScore);
+        rightScoreBoardNum = std::to_string(rightPlayerScore);
 
         // Drawing
         drawScoreBoard(gameWindowWidth, leftScoreBoardNum, rightScoreBoardNum);
