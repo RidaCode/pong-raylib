@@ -28,13 +28,14 @@ bool hasPlayerScored(Ball ball, Rectangle scoreArea)
     return CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, scoreArea);
 }
 
-void drawScoreBoard(const int gameWindowWidth, std::string leftScoreBoardNum,
-                    std::string rightScoreBoardNum)
+void drawScoreBoard(const int gameWindowWidth,
+                    std::string_view leftScoreBoardNum,
+                    std::string_view rightScoreBoardNum)
 {
     DrawText(" - ", gameWindowWidth / 2, 50, 94, WHITE);
-    DrawText(leftScoreBoardNum.c_str(), gameWindowWidth / 2 - 200, 50, 94,
+    DrawText(leftScoreBoardNum.data(), gameWindowWidth / 2 - 200, 50, 94,
              WHITE);
-    DrawText(rightScoreBoardNum.c_str(), gameWindowWidth / 2 + 200, 50, 94,
+    DrawText(rightScoreBoardNum.data(), gameWindowWidth / 2 + 200, 50, 94,
              WHITE);
 }
 
