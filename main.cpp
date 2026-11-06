@@ -52,17 +52,21 @@ void drawBall(Ball ball)
 
 int main(void)
 {
+    // Window Initialization
+    InitWindow(100, 100, "Pong first try");
+    SetTargetFPS(60);
+
     // Current Display
-    const int myDisplayWidth{3456};
-    const int myDisplayHeight{2160};
+    int currentMonitorIdx = GetCurrentMonitor();
+    int displayWidth = GetMonitorWidth(currentMonitorIdx);
+    int displayHeight = GetMonitorHeight(currentMonitorIdx);
 
     // GameWindow
-    const int gameWindowWidth{myDisplayWidth - 100};
-    const int gameWindowHeight{myDisplayHeight - 100};
-
-    // Window Initialization
-    InitWindow(gameWindowWidth, gameWindowHeight, "Pong first try");
-    SetTargetFPS(60);
+    int gameWindowWidth{displayWidth - 200};
+    int gameWindowHeight{displayHeight - 200};
+    SetWindowSize(gameWindowWidth, gameWindowHeight);
+    SetWindowPosition((displayWidth - gameWindowWidth) / 2,
+                      (displayHeight - gameWindowHeight) / 2);
 
     // Scoreboard
     int leftPlayerScore{};
@@ -72,7 +76,7 @@ int main(void)
     std::string rightScoreBoardNum = std::to_string(rightPlayerScore);
 
     // PLAYERS
-    constexpr int playersHeight{500};
+    constexpr int playersHeight{200};
     constexpr int playersWidth{30};
 
     // left player
@@ -81,19 +85,19 @@ int main(void)
     leftPlayer.height = playersHeight;
     leftPlayer.width = playersWidth;
     leftPlayer.x = playerLeftOffset;
-    leftPlayer.y = gameWindowHeight / 2;
+    leftPlayer.y = static_cast<float>(gameWindowHeight) / 2.0f;
 
     // right player
-    constexpr int playerRightOffset{gameWindowWidth - 130};
+    const float playerRightOffset{static_cast<float>(gameWindowWidth) - 130.0f};
     Rectangle rightPlayer;
     rightPlayer.height = playersHeight;
     rightPlayer.width = playersWidth;
     rightPlayer.x = playerRightOffset;
-    rightPlayer.y = gameWindowHeight / 2;
+    rightPlayer.y = static_cast<float>(gameWindowHeight) / 2.0f;
 
     Ball theBall;
-    theBall.x = gameWindowWidth / 2;
-    theBall.y = gameWindowHeight / 2 + 80;
+    theBall.x = static_cast<float>(gameWindowWidth) / 2.0f;
+    theBall.y = static_cast<float>(gameWindowHeight) / 2.0f + 80.0f;
     theBall.radius = 20.00f;
     theBall.color = WHITE;
 
@@ -101,15 +105,15 @@ int main(void)
 
     // Score Boundries
     Rectangle leftScoreBoundry;
-    leftScoreBoundry.height = gameWindowHeight;
-    leftScoreBoundry.width = 2;
+    leftScoreBoundry.height = static_cast<float>(gameWindowHeight);
+    leftScoreBoundry.width = 2.0f;
     leftScoreBoundry.x = 0;
     leftScoreBoundry.y = 0;
 
     Rectangle rightScoreBoundry;
-    rightScoreBoundry.height = gameWindowHeight;
-    rightScoreBoundry.width = 2;
-    rightScoreBoundry.x = gameWindowWidth - 2;
+    rightScoreBoundry.height = static_cast<float>(gameWindowHeight);
+    rightScoreBoundry.width = 2.0f;
+    rightScoreBoundry.x = static_cast<float>(gameWindowWidth) - 2.0f;
     rightScoreBoundry.y = 0;
 
     // GameLoop updating each frame
@@ -154,15 +158,15 @@ int main(void)
         if (hasPlayerScored(theBall, rightScoreBoundry)) {
             leftPlayerScore += 1;
             // restart the game
-            theBall.x = gameWindowWidth / 2;
-            theBall.y = gameWindowHeight / 2 + 80;
+            theBall.x = static_cast<float>(gameWindowWidth) / 2.0f;
+            theBall.y = static_cast<float>(gameWindowHeight) / 2.0f + 80.0f;
         }
 
         if (hasPlayerScored(theBall, leftScoreBoundry)) {
             rightPlayerScore += 1;
             // restart the game
-            theBall.x = gameWindowWidth / 2;
-            theBall.y = gameWindowHeight / 2 + 80;
+            theBall.x = static_cast<float>(gameWindowWidth) / 2.0f;
+            theBall.y = static_cast<float>(gameWindowHeight) / 2.0f + 80.0f;
         }
 
         EndDrawing();
