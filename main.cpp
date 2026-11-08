@@ -1,22 +1,23 @@
 #include <iostream>
 #include <raylib.h>
+#include <raymath.h>
 #include <string>
 
 // the ball
 struct Ball {
-    float x;
-    float y;
+    Vector2 pos;
+    Vector2 vel;
     float radius;
     Color color;
 };
 
 bool isBallTouchingAnyPlayer(Ball ball, Rectangle player1, Rectangle player2)
 {
-    if (CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, player1)) {
+    if (CheckCollisionCircleRec(ball.pos, ball.radius, player1)) {
         return true;
     }
 
-    if (CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, player2)) {
+    if (CheckCollisionCircleRec(ball.pos, ball.radius, player2)) {
         return true;
     }
 
@@ -25,7 +26,7 @@ bool isBallTouchingAnyPlayer(Ball ball, Rectangle player1, Rectangle player2)
 
 bool hasPlayerScored(Ball ball, Rectangle scoreArea)
 {
-    return CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, scoreArea);
+    return CheckCollisionCircleRec(ball.pos, ball.radius, scoreArea);
 }
 
 void drawScoreBoard(const int gameWindowWidth,
@@ -48,11 +49,12 @@ void drawPlayers(Rectangle leftPlayer, Color leftPlayerColor,
 
 void drawBall(Ball ball)
 {
-    DrawCircleV({ball.x, ball.y}, ball.radius, ball.color);
+    DrawCircleV(ball.pos, ball.radius, ball.color);
 }
 
 int main(void)
 {
+
     // Window Initialization
     InitWindow(100, 100, "Pong first try");
     SetTargetFPS(60);
@@ -65,6 +67,7 @@ int main(void)
     // GameWindow
     int gameWindowWidth{displayWidth - 200};
     int gameWindowHeight{displayHeight - 200};
+
     SetWindowSize(gameWindowWidth, gameWindowHeight);
     SetWindowPosition((displayWidth - gameWindowWidth) / 2,
                       (displayHeight - gameWindowHeight) / 2);
@@ -97,12 +100,21 @@ int main(void)
     rightPlayer.y = static_cast<float>(gameWindowHeight) / 2.0f;
 
     Ball theBall;
-    theBall.x = static_cast<float>(gameWindowWidth) / 2.0f;
-    theBall.y = static_cast<float>(gameWindowHeight) / 2.0f + 80.0f;
+
+    // starting position
+    Vector2 centerOfGameWindow{static_cast<float>(gameWindowWidth) / 2.0f,
+                               static_cast<float>(gameWindowHeight) / 2.0f};
+    theBall.pos = centerOfGameWindow;
+
+    // random angled velocity
+    theBall.vel = Vector2Scale(
+        Vector2Normalize(
+            {static_cast<float>(rand()) / static_cast<float>(RAND_MAX),
+             static_cast<float>(rand()) / static_cast<float>(RAND_MAX)}),
+        1000.0f);
+
     theBall.radius = 20.00f;
     theBall.color = WHITE;
-
-    float theBallSpeed{-2000.0f};
 
     // Score Boundries
     Rectangle leftScoreBoundry;
@@ -137,10 +149,12 @@ int main(void)
         // DrawRectangleRec(rightScoreBoundry, RED);
 
         // Ball Movement
-        theBall.x += theBallSpeed * GetFrameTime();
+        theBall.pos = Vector2Add(theBall.pos,
+                                 Vector2Scale(theBall.vel, GetFrameTime()));
 
         if (isBallTouchingAnyPlayer(theBall, leftPlayer, rightPlayer)) {
-            theBallSpeed = -theBallSpeed;
+            // REFLECT BOUNCE BALL
+            theBall.vel.x = -theBall.vel.x;
         }
 
         // Player movement
@@ -159,15 +173,13 @@ int main(void)
         if (hasPlayerScored(theBall, rightScoreBoundry)) {
             leftPlayerScore += 1;
             // restart the game
-            theBall.x = static_cast<float>(gameWindowWidth) / 2.0f;
-            theBall.y = static_cast<float>(gameWindowHeight) / 2.0f + 80.0f;
+            theBall.pos = centerOfGameWindow;
         }
 
         if (hasPlayerScored(theBall, leftScoreBoundry)) {
             rightPlayerScore += 1;
             // restart the game
-            theBall.x = static_cast<float>(gameWindowWidth) / 2.0f;
-            theBall.y = static_cast<float>(gameWindowHeight) / 2.0f + 80.0f;
+            theBall.pos = centerOfGameWindow;
         }
 
         EndDrawing();
