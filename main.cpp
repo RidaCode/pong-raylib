@@ -167,6 +167,8 @@ int main(void)
 
         if (isBallTouchingAnyPlayer(theBall, leftPlayer, rightPlayer)) {
             // REFLECT BOUNCE BALL
+            // FIXME: when the ball touch the player shoulder, it goes crazy,
+            // because need to flip it on Y not X
             theBall.vel.x = -theBall.vel.x;
         }
 
