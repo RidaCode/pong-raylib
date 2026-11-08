@@ -14,12 +14,25 @@ struct Ball {
 bool isBallTouchingAnyPlayer(Ball ball, Rectangle player1, Rectangle player2)
 {
     if (CheckCollisionCircleRec(ball.pos, ball.radius, player1)) {
+        // float closestX{Vector2Clamp(ball, {player1.x, player1.y}, Vector2
+        // max)
         return true;
     }
 
     if (CheckCollisionCircleRec(ball.pos, ball.radius, player2)) {
         return true;
     }
+
+    return false;
+}
+
+bool isBallTouchingAnyWall(Ball ball, float gameWindowHeight)
+{
+    if (ball.pos.y < 0.0f)
+        return true;
+
+    if (ball.pos.y > gameWindowHeight)
+        return true;
 
     return false;
 }
@@ -111,7 +124,7 @@ int main(void)
         Vector2Normalize(
             {static_cast<float>(rand()) / static_cast<float>(RAND_MAX),
              static_cast<float>(rand()) / static_cast<float>(RAND_MAX)}),
-        1000.0f);
+        2000.0f);
 
     theBall.radius = 20.00f;
     theBall.color = WHITE;
@@ -155,6 +168,12 @@ int main(void)
         if (isBallTouchingAnyPlayer(theBall, leftPlayer, rightPlayer)) {
             // REFLECT BOUNCE BALL
             theBall.vel.x = -theBall.vel.x;
+        }
+
+        if (isBallTouchingAnyWall(theBall,
+                                  static_cast<float>(gameWindowHeight))) {
+            // REFLECT BOUNCE BALL
+            theBall.vel.y = -theBall.vel.y;
         }
 
         // Player movement
