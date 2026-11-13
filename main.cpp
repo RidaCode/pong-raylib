@@ -21,40 +21,45 @@ void reflectBallOnAnyPlayerTouch(Ball& ball, Rectangle player1,
     // bool hasHitPlayerShoulder{CheckCollisionLines(ball.pos, Vector2 endPos1,
     // Vector2 startPos2, Vector2 endPos2, Vector2 *collisionPoint)};
     Vector2 LeftPlayerDownShoulder{.x = player1.x,
-                                   .y = player1.y + player1.height};
+                                   .y = player1.y + player1.height + 20};
 
     Rectangle LeftPlayerDownShoulderRec{.x = LeftPlayerDownShoulder.x,
                                         .y = LeftPlayerDownShoulder.y,
                                         .width = 30,
-                                        .height = 30};
+                                        .height = 10};
 
     DrawRectangleRec(LeftPlayerDownShoulderRec, RED);
 
-    Vector2 LeftPlayerUpShoulder{.x = player1.x, .y = player1.y};
+    Vector2 LeftPlayerUpShoulder{.x = player1.x, .y = player1.y - 20};
 
     Rectangle LeftPlayerUpShoulderRec{.x = LeftPlayerUpShoulder.x,
                                       .y = LeftPlayerUpShoulder.y,
                                       .width = 30,
-                                      .height = 30};
+                                      .height = 10};
 
     DrawRectangleRec(LeftPlayerUpShoulderRec, RED);
+
+    if ((CheckCollisionCircleRec(ball.pos, ball.radius,
+                                 LeftPlayerDownShoulderRec)
+         && ball.vel.y < 0)
+        || (CheckCollisionCircleRec(ball.pos, ball.radius,
+                                    LeftPlayerUpShoulderRec)
+            && ball.vel.y > 0)) {
+
+        ball.vel.y = -ball.vel.y;
+        return;
+    }
 
     if (CheckCollisionCircleRec(ball.pos, ball.radius, player1)) {
         // float closestX{Vector2Clamp(ball, {player1.x, player1.y}, Vector2
         // max)
 
-        if (CheckCollisionCircleRec(ball.pos, ball.radius,
-                                    LeftPlayerDownShoulderRec)
-            || CheckCollisionCircleRec(ball.pos, ball.radius,
-                                       LeftPlayerUpShoulderRec)) {
-            ball.vel.y = -ball.vel.y;
-            return;
-        }
-
-        ball.vel.x = -ball.vel.x;
+        if (ball.vel.x < 0)
+            ball.vel.x = -ball.vel.x;
     }
 
-    if (CheckCollisionCircleRec(ball.pos, ball.radius, player2)) {
+    if (CheckCollisionCircleRec(ball.pos, ball.radius, player2)
+        && ball.vel.x > 0) {
         ball.vel.x = -ball.vel.x;
     }
 }
@@ -203,7 +208,7 @@ int main(void)
                                   static_cast<float>(gameWindowHeight));
 
         // Player movement
-        float playerMovementSpeed{1500 * GetFrameTime()};
+        float playerMovementSpeed{1000 * GetFrameTime()};
         if (IsKeyDown(KEY_W)) {
             leftPlayer.y -= playerMovementSpeed;
         }
