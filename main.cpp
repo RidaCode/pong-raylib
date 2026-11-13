@@ -11,30 +11,34 @@ struct Ball {
     Color color;
 };
 
-bool isBallTouchingAnyPlayer(Ball ball, Rectangle player1, Rectangle player2)
+void reflectBallOnAnyPlayerTouch(Ball& ball, Rectangle player1,
+                                 Rectangle player2)
 {
+    // REFLECT BOUNCE BALL
+    // FIXME: when the ball touch the player shoulder, it goes crazy,
+    // because need to flip it on Y not X
+
     if (CheckCollisionCircleRec(ball.pos, ball.radius, player1)) {
         // float closestX{Vector2Clamp(ball, {player1.x, player1.y}, Vector2
         // max)
-        return true;
+
+        ball.vel.x = -ball.vel.x;
     }
 
     if (CheckCollisionCircleRec(ball.pos, ball.radius, player2)) {
-        return true;
+        ball.vel.x = -ball.vel.x;
     }
-
-    return false;
 }
 
-bool isBallTouchingAnyWall(Ball ball, float gameWindowHeight)
+void reflectBallOnAnyWallTouch(Ball& ball, float gameWindowHeight)
 {
-    if (ball.pos.y < 0.0f)
-        return true;
+    if (ball.pos.y < 0.0f) {
+        ball.vel.y = -ball.vel.y;
+    }
 
-    if (ball.pos.y > gameWindowHeight)
-        return true;
-
-    return false;
+    if (ball.pos.y > gameWindowHeight) {
+        ball.vel.y = -ball.vel.y;
+    }
 }
 
 bool hasPlayerScored(Ball ball, Rectangle scoreArea)
@@ -157,36 +161,25 @@ int main(void)
         drawPlayers(leftPlayer, BLUE, rightPlayer, RED);
         drawBall(theBall);
 
-        // No need to draw them, leaving them for DEBUG
-        // DrawRectangleRec(leftScoreBoundry, RED);
-        // DrawRectangleRec(rightScoreBoundry, RED);
-
         // Ball Movement
         theBall.pos = Vector2Add(theBall.pos,
                                  Vector2Scale(theBall.vel, GetFrameTime()));
 
-        if (isBallTouchingAnyPlayer(theBall, leftPlayer, rightPlayer)) {
-            // REFLECT BOUNCE BALL
-            // FIXME: when the ball touch the player shoulder, it goes crazy,
-            // because need to flip it on Y not X
-            theBall.vel.x = -theBall.vel.x;
-        }
+        // Right Player AI
+        rightPlayer.y = theBall.pos.y;
 
-        if (isBallTouchingAnyWall(theBall,
-                                  static_cast<float>(gameWindowHeight))) {
-            // REFLECT BOUNCE BALL
-            theBall.vel.y = -theBall.vel.y;
-        }
+        // Ball Relection
+        reflectBallOnAnyPlayerTouch(theBall, leftPlayer, rightPlayer);
+        reflectBallOnAnyWallTouch(theBall,
+                                  static_cast<float>(gameWindowHeight));
 
         // Player movement
         float playerMovementSpeed{1500 * GetFrameTime()};
         if (IsKeyDown(KEY_W)) {
-            rightPlayer.y -= playerMovementSpeed;
             leftPlayer.y -= playerMovementSpeed;
         }
 
         if (IsKeyDown(KEY_S)) {
-            rightPlayer.y += playerMovementSpeed;
             leftPlayer.y += playerMovementSpeed;
         }
 
