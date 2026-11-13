@@ -18,9 +18,38 @@ void reflectBallOnAnyPlayerTouch(Ball& ball, Rectangle player1,
     // FIXME: when the ball touch the player shoulder, it goes crazy,
     // because need to flip it on Y not X
 
+    // bool hasHitPlayerShoulder{CheckCollisionLines(ball.pos, Vector2 endPos1,
+    // Vector2 startPos2, Vector2 endPos2, Vector2 *collisionPoint)};
+    Vector2 LeftPlayerDownShoulder{.x = player1.x,
+                                   .y = player1.y + player1.height};
+
+    Rectangle LeftPlayerDownShoulderRec{.x = LeftPlayerDownShoulder.x,
+                                        .y = LeftPlayerDownShoulder.y,
+                                        .width = 30,
+                                        .height = 30};
+
+    DrawRectangleRec(LeftPlayerDownShoulderRec, RED);
+
+    Vector2 LeftPlayerUpShoulder{.x = player1.x, .y = player1.y};
+
+    Rectangle LeftPlayerUpShoulderRec{.x = LeftPlayerUpShoulder.x,
+                                      .y = LeftPlayerUpShoulder.y,
+                                      .width = 30,
+                                      .height = 30};
+
+    DrawRectangleRec(LeftPlayerUpShoulderRec, RED);
+
     if (CheckCollisionCircleRec(ball.pos, ball.radius, player1)) {
         // float closestX{Vector2Clamp(ball, {player1.x, player1.y}, Vector2
         // max)
+
+        if (CheckCollisionCircleRec(ball.pos, ball.radius,
+                                    LeftPlayerDownShoulderRec)
+            || CheckCollisionCircleRec(ball.pos, ball.radius,
+                                       LeftPlayerUpShoulderRec)) {
+            ball.vel.y = -ball.vel.y;
+            return;
+        }
 
         ball.vel.x = -ball.vel.x;
     }
@@ -128,7 +157,7 @@ int main(void)
         Vector2Normalize(
             {static_cast<float>(rand()) / static_cast<float>(RAND_MAX),
              static_cast<float>(rand()) / static_cast<float>(RAND_MAX)}),
-        2000.0f);
+        1000.0f);
 
     theBall.radius = 20.00f;
     theBall.color = WHITE;
