@@ -42,17 +42,14 @@ void reflectBallOnFaceCollision([[maybe_unused]] Ball& ball, Rectangle& player)
     // Get the line of Left face of player
     DrawLineV(topLeftCorner, bottomLeftCorner, RED);
 
-    // FIX:  The ball having a hard time to choose on which axies to flip on X
-    // or Y ? Because we end up either touching two different faces at the same
-    // time e.g touching Right and Bottom at the same time sometimes we also end
-    // up inside the player infintly switching X until we exit the player
-
     Vector2 collisionPoint;
     // Reflect ball on Right and Left faces of player
-    if (CheckCollisionLines(topRightCorner, bottomRightCorner, ball.pos,
-                            nextBallPos, &collisionPoint)
-        || CheckCollisionLines(topLeftCorner, bottomLeftCorner, ball.pos,
-                               nextBallPos, &collisionPoint)) {
+    if ((ball.pos.x > player.x + player.width
+         && CheckCollisionLines(topRightCorner, bottomRightCorner, ball.pos,
+                                nextBallPos, &collisionPoint))
+        || (ball.pos.x < player.x
+            && CheckCollisionLines(topLeftCorner, bottomLeftCorner, ball.pos,
+                                   nextBallPos, &collisionPoint))) {
 
         Ball ballHit{.pos = {collisionPoint.x, collisionPoint.y},
                      .vel = {0, 0},
@@ -64,10 +61,12 @@ void reflectBallOnFaceCollision([[maybe_unused]] Ball& ball, Rectangle& player)
     }
 
     // Reflect ball on Top and Bottom faces of player
-    if (CheckCollisionLines(topLeftCorner, topRightCorner, ball.pos,
-                            nextBallPos, &collisionPoint)
-        || CheckCollisionLines(bottomLeftCorner, bottomRightCorner, ball.pos,
-                               nextBallPos, &collisionPoint)) {
+    if ((ball.pos.y < player.y
+         && CheckCollisionLines(topLeftCorner, topRightCorner, ball.pos,
+                                nextBallPos, &collisionPoint))
+        || (ball.pos.y > player.y + player.height
+            && CheckCollisionLines(bottomLeftCorner, bottomRightCorner,
+                                   ball.pos, nextBallPos, &collisionPoint))) {
 
         Ball ballHit{.pos = {collisionPoint.x, collisionPoint.y},
                      .vel = {0, 0},
@@ -215,7 +214,8 @@ int main(void)
                                  Vector2Scale(theBall.vel, GetFrameTime()));
 
         // Right Player AI
-        rightPlayer.y = theBall.pos.y;
+        float rightPlayerCenter{rightPlayer.height / 2};
+        rightPlayer.y = theBall.pos.y - rightPlayerCenter;
 
         // Ball Relection
         reflectBallOnFaceCollision(theBall, leftPlayer);
