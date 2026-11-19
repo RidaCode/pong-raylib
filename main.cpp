@@ -9,58 +9,73 @@ struct Ball {
     Vector2 vel;
     float radius;
     Color color;
+    // Rectangle* CollisionObject = nullptr;
 };
 
-void reflectBallOnAnyPlayerTouch(Ball& ball, Rectangle player1,
-                                 Rectangle player2)
+void reflectBallOnFaceCollision([[maybe_unused]] Ball& ball, Rectangle& player)
 {
-    // REFLECT BOUNCE BALL
-    // FIXME: when the ball touch the player shoulder, it goes crazy,
-    // because need to flip it on Y not X
+    // it's ball.pos as first point and ball.pos + ball.vel as second point
+    [[maybe_unused]]
+    Vector2 nextBallPos{
+        Vector2Add(ball.pos, Vector2Scale(ball.vel, GetFrameTime()))};
 
-    // bool hasHitPlayerShoulder{CheckCollisionLines(ball.pos, Vector2 endPos1,
-    // Vector2 startPos2, Vector2 endPos2, Vector2 *collisionPoint)};
-    Vector2 LeftPlayerDownShoulder{.x = player1.x,
-                                   .y = player1.y + player1.height + 20};
+    DrawLineV(ball.pos, nextBallPos, GREEN);
 
-    Rectangle LeftPlayerDownShoulderRec{.x = LeftPlayerDownShoulder.x,
-                                        .y = LeftPlayerDownShoulder.y,
-                                        .width = 30,
-                                        .height = 10};
-
-    DrawRectangleRec(LeftPlayerDownShoulderRec, RED);
-
-    Vector2 LeftPlayerUpShoulder{.x = player1.x, .y = player1.y - 20};
-
-    Rectangle LeftPlayerUpShoulderRec{.x = LeftPlayerUpShoulder.x,
-                                      .y = LeftPlayerUpShoulder.y,
-                                      .width = 30,
-                                      .height = 10};
-
-    DrawRectangleRec(LeftPlayerUpShoulderRec, RED);
-
-    if ((CheckCollisionCircleRec(ball.pos, ball.radius,
-                                 LeftPlayerDownShoulderRec)
-         && ball.vel.y < 0)
-        || (CheckCollisionCircleRec(ball.pos, ball.radius,
-                                    LeftPlayerUpShoulderRec)
-            && ball.vel.y > 0)) {
-
-        ball.vel.y = -ball.vel.y;
+    // Check if ball next pos touch player
+    if (!CheckCollisionCircleRec(nextBallPos, ball.radius, player))
         return;
-    }
 
-    if (CheckCollisionCircleRec(ball.pos, ball.radius, player1)) {
-        // float closestX{Vector2Clamp(ball, {player1.x, player1.y}, Vector2
-        // max)
+    // Get the line of Top face of player
+    Vector2 topLeftCorner{player.x, player.y};
+    Vector2 topRightCorner{player.x + player.width, player.y};
+    DrawLineV(topLeftCorner, topRightCorner, RED);
 
-        if (ball.vel.x < 0)
-            ball.vel.x = -ball.vel.x;
-    }
+    // Get the line of Bottom face of player
+    Vector2 bottomLeftCorner{player.x, player.y + player.height};
+    Vector2 bottomRightCorner{player.x + player.width,
+                              player.y + player.height};
+    DrawLineV(bottomLeftCorner, bottomRightCorner, RED);
 
-    if (CheckCollisionCircleRec(ball.pos, ball.radius, player2)
-        && ball.vel.x > 0) {
+    // Get the line of Right face of player
+    DrawLineV(topRightCorner, bottomRightCorner, RED);
+
+    // Get the line of Left face of player
+    DrawLineV(topLeftCorner, bottomLeftCorner, RED);
+
+    // FIX:  The ball having a hard time to choose on which axies to flip on X
+    // or Y ? Because we end up either touching two different faces at the same
+    // time e.g touching Right and Bottom at the same time sometimes we also end
+    // up inside the player infintly switching X until we exit the player
+
+    Vector2 collisionPoint;
+    // Reflect ball on Right and Left faces of player
+    if (CheckCollisionLines(topRightCorner, bottomRightCorner, ball.pos,
+                            nextBallPos, &collisionPoint)
+        || CheckCollisionLines(topLeftCorner, bottomLeftCorner, ball.pos,
+                               nextBallPos, &collisionPoint)) {
+
+        Ball ballHit{.pos = {collisionPoint.x, collisionPoint.y},
+                     .vel = {0, 0},
+                     .radius = ball.radius,
+                     .color = RED};
+
+        DrawCircleV(ballHit.pos, ballHit.radius, ballHit.color);
         ball.vel.x = -ball.vel.x;
+    }
+
+    // Reflect ball on Top and Bottom faces of player
+    if (CheckCollisionLines(topLeftCorner, topRightCorner, ball.pos,
+                            nextBallPos, &collisionPoint)
+        || CheckCollisionLines(bottomLeftCorner, bottomRightCorner, ball.pos,
+                               nextBallPos, &collisionPoint)) {
+
+        Ball ballHit{.pos = {collisionPoint.x, collisionPoint.y},
+                     .vel = {0, 0},
+                     .radius = ball.radius,
+                     .color = RED};
+
+        DrawCircleV(ballHit.pos, ballHit.radius, ballHit.color);
+        ball.vel.y = -ball.vel.y;
     }
 }
 
@@ -160,9 +175,9 @@ int main(void)
     // random angled velocity
     theBall.vel = Vector2Scale(
         Vector2Normalize(
-            {static_cast<float>(rand()) / static_cast<float>(RAND_MAX),
+            {static_cast<float>(rand()) / static_cast<float>(-RAND_MAX),
              static_cast<float>(rand()) / static_cast<float>(RAND_MAX)}),
-        1000.0f);
+        1200.0f);
 
     theBall.radius = 20.00f;
     theBall.color = WHITE;
@@ -203,7 +218,15 @@ int main(void)
         rightPlayer.y = theBall.pos.y;
 
         // Ball Relection
-        reflectBallOnAnyPlayerTouch(theBall, leftPlayer, rightPlayer);
+        reflectBallOnFaceCollision(theBall, leftPlayer);
+        reflectBallOnFaceCollision(theBall, rightPlayer);
+
+        [[maybe_unused]]
+        float leftPlayerBottomShoulderHitPoint{theBall.pos.y - 210.0f};
+
+        [[maybe_unused]]
+        float leftPlayerTopShoulderHitPoint{theBall.pos.y + 10.0f};
+
         reflectBallOnAnyWallTouch(theBall,
                                   static_cast<float>(gameWindowHeight));
 
