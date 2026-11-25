@@ -17,7 +17,8 @@ void reflectBallOnFaceCollision([[maybe_unused]] Ball& ball, Rectangle& player)
     // it's ball.pos as first point and ball.pos + ball.vel as second point
     [[maybe_unused]]
     Vector2 nextBallPos{
-        Vector2Add(ball.pos, Vector2Scale(ball.vel, GetFrameTime()))};
+        Vector2Add(ball.pos, Vector2Scale(ball.vel, GetFrameTime()))
+    };
 
     DrawLineV(ball.pos, nextBallPos, GREEN);
 
@@ -32,8 +33,9 @@ void reflectBallOnFaceCollision([[maybe_unused]] Ball& ball, Rectangle& player)
 
     // Get the line of Bottom face of player
     Vector2 bottomLeftCorner{player.x, player.y + player.height};
-    Vector2 bottomRightCorner{player.x + player.width,
-                              player.y + player.height};
+    Vector2 bottomRightCorner{
+        player.x + player.width, player.y + player.height
+    };
     DrawLineV(bottomLeftCorner, bottomRightCorner, RED);
 
     // Get the line of Right face of player
@@ -45,16 +47,22 @@ void reflectBallOnFaceCollision([[maybe_unused]] Ball& ball, Rectangle& player)
     Vector2 collisionPoint;
     // Reflect ball on Right and Left faces of player
     if ((ball.pos.x > player.x + player.width
-         && CheckCollisionLines(topRightCorner, bottomRightCorner, ball.pos,
-                                nextBallPos, &collisionPoint))
+         && CheckCollisionLines(
+             topRightCorner, bottomRightCorner, ball.pos, nextBallPos,
+             &collisionPoint
+         ))
         || (ball.pos.x < player.x
-            && CheckCollisionLines(topLeftCorner, bottomLeftCorner, ball.pos,
-                                   nextBallPos, &collisionPoint))) {
+            && CheckCollisionLines(
+                topLeftCorner, bottomLeftCorner, ball.pos, nextBallPos,
+                &collisionPoint
+            ))) {
 
-        Ball ballHit{.pos = {collisionPoint.x, collisionPoint.y},
-                     .vel = {0, 0},
-                     .radius = ball.radius,
-                     .color = RED};
+        Ball ballHit{
+            .pos = {collisionPoint.x, collisionPoint.y},
+            .vel = {0, 0},
+            .radius = ball.radius,
+            .color = RED
+        };
 
         DrawCircleV(ballHit.pos, ballHit.radius, ballHit.color);
         ball.vel.x = -ball.vel.x;
@@ -62,16 +70,22 @@ void reflectBallOnFaceCollision([[maybe_unused]] Ball& ball, Rectangle& player)
 
     // Reflect ball on Top and Bottom faces of player
     if ((ball.pos.y < player.y
-         && CheckCollisionLines(topLeftCorner, topRightCorner, ball.pos,
-                                nextBallPos, &collisionPoint))
+         && CheckCollisionLines(
+             topLeftCorner, topRightCorner, ball.pos, nextBallPos,
+             &collisionPoint
+         ))
         || (ball.pos.y > player.y + player.height
-            && CheckCollisionLines(bottomLeftCorner, bottomRightCorner,
-                                   ball.pos, nextBallPos, &collisionPoint))) {
+            && CheckCollisionLines(
+                bottomLeftCorner, bottomRightCorner, ball.pos, nextBallPos,
+                &collisionPoint
+            ))) {
 
-        Ball ballHit{.pos = {collisionPoint.x, collisionPoint.y},
-                     .vel = {0, 0},
-                     .radius = ball.radius,
-                     .color = RED};
+        Ball ballHit{
+            .pos = {collisionPoint.x, collisionPoint.y},
+            .vel = {0, 0},
+            .radius = ball.radius,
+            .color = RED
+        };
 
         DrawCircleV(ballHit.pos, ballHit.radius, ballHit.color);
         ball.vel.y = -ball.vel.y;
@@ -94,19 +108,24 @@ bool hasPlayerScored(Ball ball, Rectangle scoreArea)
     return CheckCollisionCircleRec(ball.pos, ball.radius, scoreArea);
 }
 
-void drawScoreBoard(const int gameWindowWidth,
-                    std::string_view leftScoreBoardNum,
-                    std::string_view rightScoreBoardNum)
+void drawScoreBoard(
+    const int gameWindowWidth, std::string_view leftScoreBoardNum,
+    std::string_view rightScoreBoardNum
+)
 {
     DrawText(" - ", gameWindowWidth / 2, 50, 94, WHITE);
-    DrawText(leftScoreBoardNum.data(), gameWindowWidth / 2 - 200, 50, 94,
-             WHITE);
-    DrawText(rightScoreBoardNum.data(), gameWindowWidth / 2 + 200, 50, 94,
-             WHITE);
+    DrawText(
+        leftScoreBoardNum.data(), gameWindowWidth / 2 - 200, 50, 94, WHITE
+    );
+    DrawText(
+        rightScoreBoardNum.data(), gameWindowWidth / 2 + 200, 50, 94, WHITE
+    );
 }
 
-void drawPlayers(Rectangle leftPlayer, Color leftPlayerColor,
-                 Rectangle rightPlayer, Color rightPlayerColor)
+void drawPlayers(
+    Rectangle leftPlayer, Color leftPlayerColor, Rectangle rightPlayer,
+    Color rightPlayerColor
+)
 {
     DrawRectangleRec(leftPlayer, leftPlayerColor);
     DrawRectangleRec(rightPlayer, rightPlayerColor);
@@ -134,8 +153,10 @@ int main(void)
     int gameWindowHeight{displayHeight - 200};
 
     SetWindowSize(gameWindowWidth, gameWindowHeight);
-    SetWindowPosition((displayWidth - gameWindowWidth) / 2,
-                      (displayHeight - gameWindowHeight) / 2);
+    SetWindowPosition(
+        (displayWidth - gameWindowWidth) / 2,
+        (displayHeight - gameWindowHeight) / 2
+    );
 
     // Scoreboard
     int leftPlayerScore{};
@@ -167,16 +188,20 @@ int main(void)
     Ball theBall;
 
     // starting position
-    Vector2 centerOfGameWindow{static_cast<float>(gameWindowWidth) / 2.0f,
-                               static_cast<float>(gameWindowHeight) / 2.0f};
+    Vector2 centerOfGameWindow{
+        static_cast<float>(gameWindowWidth) / 2.0f,
+        static_cast<float>(gameWindowHeight) / 2.0f
+    };
     theBall.pos = centerOfGameWindow;
 
     // random angled velocity
     theBall.vel = Vector2Scale(
         Vector2Normalize(
             {static_cast<float>(rand()) / static_cast<float>(-RAND_MAX),
-             static_cast<float>(rand()) / static_cast<float>(RAND_MAX)}),
-        1200.0f);
+             static_cast<float>(rand()) / static_cast<float>(RAND_MAX)}
+        ),
+        1200.0f
+    );
 
     theBall.radius = 20.00f;
     theBall.color = WHITE;
@@ -210,8 +235,9 @@ int main(void)
         drawBall(theBall);
 
         // Ball Movement
-        theBall.pos = Vector2Add(theBall.pos,
-                                 Vector2Scale(theBall.vel, GetFrameTime()));
+        theBall.pos = Vector2Add(
+            theBall.pos, Vector2Scale(theBall.vel, GetFrameTime())
+        );
 
         // Right Player AI
         float rightPlayerCenter{rightPlayer.height / 2};
@@ -227,8 +253,9 @@ int main(void)
         [[maybe_unused]]
         float leftPlayerTopShoulderHitPoint{theBall.pos.y + 10.0f};
 
-        reflectBallOnAnyWallTouch(theBall,
-                                  static_cast<float>(gameWindowHeight));
+        reflectBallOnAnyWallTouch(
+            theBall, static_cast<float>(gameWindowHeight)
+        );
 
         // Player movement
         float playerMovementSpeed{1000 * GetFrameTime()};
